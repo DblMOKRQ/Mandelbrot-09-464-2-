@@ -17,6 +17,10 @@ public class MainWindow extends JFrame {
     private final Painter painter;
     private final Fractal mandelbrot;
     private final Converter conv;
+
+    
+    private final FractalHistory history = new FractalHistory();
+
     public MainWindow(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 650));
