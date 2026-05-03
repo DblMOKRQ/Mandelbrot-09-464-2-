@@ -19,4 +19,13 @@ public class FrastalHistory{
         states.addLast(state);
     }
 
+    //возвращаем текушее состояние если оно есть
+    public FractaleState undo() {
+        if (states.size() > 1) {
+            states.removeLast(); 
+            return states.getLast(); 
+        }
+        return null;
+    }
+
 }
