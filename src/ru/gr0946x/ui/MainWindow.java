@@ -18,7 +18,10 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
     private final Fractal mandelbrot;
     private final Converter conv;
 
-    public MainWindow() {
+    
+    private final FractalHistory history = new FractalHistory();
+
+    public MainWindow(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 650));
 
@@ -33,6 +36,15 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         });
 
         mainPanel = new SelectablePanel(painter);
+        mainPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                double cx = conv.xScr2Crt(e.getX());
+                double cy = conv.yScr2Crt(e.getY());
+
+                new JuliaWindow(cx, cy).setVisible(true);
+            }
+        });
         mainPanel.setBackground(Color.WHITE);
         mainPanel.addSelectListener((r) -> {
             var xMin = conv.xScr2Crt(r.x);
