@@ -26,6 +26,9 @@ public class MainWindow extends JFrame {
         setMinimumSize(new Dimension(800, 650));
         mandelbrot = new Mandelbrot();
         conv = new Converter(-2.0, 1.0, -1.0, 1.0);
+
+        saveCurrentState();
+
         painter = new FractalPainter(mandelbrot, conv, (value)->{
             if (value == 1.0) return Color.BLACK;
             var r = (float)abs(sin(5 * value));
@@ -35,7 +38,10 @@ public class MainWindow extends JFrame {
         });
         mainPanel = new SelectablePanel(painter);
         mainPanel.setBackground(Color.WHITE);
+
+
         mainPanel.addSelectListener((r)->{
+            saveCurrentState();
             var xMin = conv.xScr2Crt(r.x);
             var xMax = conv.xScr2Crt(r.x + r.width);
             var yMin = conv.yScr2Crt(r.y + r.height);
@@ -44,7 +50,23 @@ public class MainWindow extends JFrame {
             conv.setYShape(yMin, yMax);
             mainPanel.repaint();
         });
+
+        mainPanel.addPanListener((dx, dy) -> {
+            saveCurrentState();
+            PanHelper.translatePixels(conv, dx, dy, painter.getWidth(), painter.getHeight());
+            mainPanel.repaint();
+        });
+
         setContent();
+    }
+
+    private void saveCurrentState() {
+        history.add(new FractaleState(
+                conv.getXMin(),
+                conv.getXMax(),
+                conv.getYMin(),
+                conv.getYMax()
+        ));
     }
 
     private void setContent(){
