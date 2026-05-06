@@ -29,34 +29,32 @@ public class FractalSaver {
         chooser.addChoosableFileFilter(jpgFilter);
         chooser.addChoosableFileFilter(fracFilter);
         chooser.setFileFilter(pngFilter);
+        chooser.setSelectedFile(new File("fractal"));
 
         int result = chooser.showSaveDialog(parent);
-        if (result == JFileChooser.APPROVE_OPTION){
-            File file = chooser.getSelectedFile();
-            FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter) chooser.getFileFilter();
-            String extension = selectedFilter.getExtensions()[0];
-            file = addExtension(file, extension);
-
-            if (extension.equals("frac")) {
-                return saveAsFractal(file, conv);
-            }
-            else{
-                return saveAsImage(file, conv, fractal, colorFunc);
-            }
+        if (result != JFileChooser.APPROVE_OPTION){
+            return false;
         }
 
-        return false;
+        File file = chooser.getSelectedFile();
+        FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter) chooser.getFileFilter();
+        String extension = selectedFilter.getExtensions()[0];
+        file = addExtension(file, extension);
+
+        if (extension.equals("frac")) {
+            return saveAsFractal(file, conv);
+        }
+        else{
+            return saveAsImage(file, conv, fractal, colorFunc, extension);
+        }
     }
 
     private static File addExtension(File file, String ext) {
         String name = file.getName();
         //если сохранили файл с параметром сохранения
         int lastDot = name.lastIndexOf('.');
-        if (lastDot > 0 && lastDot < name.length() - 1){
-            String currentExt = name.substring(lastDot + 1).toLowerCase();
-            if (currentExt.equals(ext)){
-                return file;
-            }
+        if (lastDot > 0){
+            name = name.substring(0, lastDot);
         }
 
         //если нет параметра сохранения или он неправильный - добавляем
@@ -64,7 +62,7 @@ public class FractalSaver {
 
     }
 
-    public static boolean saveAsImage(File file, Converter conv, Fractal fractal, ColorFunction colorFunc) {
+    public static boolean saveAsImage(File file, Converter conv, Fractal fractal, ColorFunction colorFunc, String format) {
         try {
             int h = conv.getHeight();
             int w = conv.getWidth();
@@ -86,18 +84,15 @@ public class FractalSaver {
 
             //подписи
             Graphics2D g2d = img.createGraphics();
-            g2d.setFont(new Font("Arial", Font.PLAIN, 12));
+            g2d.setFont(new Font("Monospaced", Font.PLAIN, 10));
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             String coords = String.format("X:[%.4f;%.4f] Y:[%.4f;%.4f]", conv.xScr2Crt(0), conv.xScr2Crt(w), conv.yScr2Crt(h), conv.yScr2Crt(0));
+            //для тени, чтобы координаты точно было видно
             g2d.setColor(Color.BLACK);
             g2d.drawString(coords, 6, h - 4);
-            g2d.setColor(Color.WHITE)
+            g2d.setColor(Color.WHITE);
             g2d.drawString(coords, 5, h - 5);
             g2d.dispose();
-
-            //определение формата
-            String name = file.getName().toLowerCase();
-            String format = name.endsWith(".png") ? "png" : "jpg";
 
             return ImageIO.write(img, format, file);
         }
@@ -118,6 +113,9 @@ public class FractalSaver {
             props.setProperty("yMax", String.valueOf(conv.yScr2Crt(0)));
             props.setProperty("width", String.valueOf(conv.getWidth()));
             props.setProperty("height", String.valueOf(conv.getHeight()));
+            props.setProperty("maxIterations", "100");
+            props.setProperty("colorScheme", "mandelbrot_default");
+
 
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 props.store(fos, "Fractal data - do not edit manualy");
