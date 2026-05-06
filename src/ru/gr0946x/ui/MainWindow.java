@@ -1,5 +1,6 @@
 package ru.gr0946x.ui;
 
+import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.Converter;
 import ru.gr0946x.ui.fractals.Fractal;
 import ru.gr0946x.ui.fractals.Mandelbrot;
@@ -100,10 +101,20 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
     public void onShowJulia() { /* TODO п. 8 */ }
 
     @Override
-    public void onIncreaseIterations() { /* TODO п. 10 */ }
+    public void onIncreaseIterations() {
+        ((Mandelbrot) mandelbrot).setMaxIterations(
+                ((Mandelbrot) mandelbrot).getMaxIterations() + 50
+        );
+        mainPanel.repaint();
+    }
 
     @Override
-    public void onDecreaseIterations() { /* TODO п. 10 */ }
+    public void onDecreaseIterations() {
+        ((Mandelbrot) mandelbrot).setMaxIterations(
+                ((Mandelbrot) mandelbrot).getMaxIterations() - 50
+        );
+        mainPanel.repaint();
+    }
 
     @Override
     public void onOpenTour() { /* TODO п. 11* */ }

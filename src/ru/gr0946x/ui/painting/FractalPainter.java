@@ -1,5 +1,6 @@
 package ru.gr0946x.ui.painting;
 
+import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.Converter;
 import ru.gr0946x.ui.fractals.ColorFunction;
 import ru.gr0946x.ui.fractals.Fractal;
@@ -49,12 +50,24 @@ public class FractalPainter implements Painter {
         conv.setHeight(height);
     }
 
+    private void updateIterations() {
+        if (fractal instanceof Mandelbrot mandelbrot) {
+            double currentRange = conv.getXMax() - conv.getXMin();
+            final double INITIAL_RANGE = 3.0;
+            double zoomFactor = INITIAL_RANGE / currentRange;
+            int dynamicIter = (int)(100.0 * (1.0 + Math.log10(Math.max(1.0, zoomFactor))));
+            dynamicIter = Math.min(dynamicIter, 2000);
+            mandelbrot.setMaxIterations(dynamicIter);
+        }
+    }
+
     @Override
     public void paint(Graphics g) {
         int w = getWidth();
         int h = getHeight();
 
         if (w <= 0 || h <= 0) return;
+        updateIterations();
 
 
         int chunkWidth = w / cores;
