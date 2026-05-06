@@ -16,23 +16,36 @@ import java.util.Properties;
 
 
 public class FractalSaver {
-    public static File showSaveDialog(Component parent){
+    public static boolean showSaveDialog(Component parent, Converter conv, Fractal fractal, ColorFunction colorFunc){
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Сохранить фрактал");
 
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG (*.png)", "png"));
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter("JPG (*.jpg)", "jpg"));
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Fractal Data (*.frac)", "frac"));
-        chooser.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG (*.png)", "png");
+        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("JPG (*.jpg)", "jpg");
+        FileNameExtensionFilter fracFilter = new FileNameExtensionFilter("Fractal Data (*.frac)", "frac");
 
-        chooser.setSelectedFile(new File("fractal"));
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(pngFilter);
+        chooser.addChoosableFileFilter(jpgFilter);
+        chooser.addChoosableFileFilter(fracFilter);
+        chooser.setFileFilter(pngFilter);
 
         int result = chooser.showSaveDialog(parent);
-        if (result != JFileChooser.APPROVE_OPTION){
-            return null;
+        if (result == JFileChooser.APPROVE_OPTION){
+            File file = chooser.getSelectedFile();
+            FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter) chooser.getFileFilter();
+            String extension = selectedFilter.getExtensions()[0];
+            file = addExtension(file, extension);
+
+            if (extension.equals("frac")) {
+                return saveAsFractal(file, conv);
+            }
+            else{
+                return saveAsImage(file, conv, fractal, colorFunc);
+            }
         }
 
-        return chooser.getSelectedFile();
+        return false;
     }
 
     private static File addExtension(File file, String ext) {
@@ -51,7 +64,7 @@ public class FractalSaver {
 
     }
 
-    public static boolean SaveAsImage(File file, Converter conv, Fractal fractal, ColorFunction colorFunc) {
+    public static boolean saveAsImage(File file, Converter conv, Fractal fractal, ColorFunction colorFunc) {
         try {
             int h = conv.getHeight();
             int w = conv.getWidth();
