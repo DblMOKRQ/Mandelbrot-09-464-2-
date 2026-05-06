@@ -52,7 +52,7 @@ public class FractalSaver {
         String name = file.getName();
         //если сохранили файл с параметром сохранения
         int lastDot = name.lastIndexOf('.');
-        if (lastDot > 0){
+        if (lastDot > 0 && lastDot < name.length() - 1){
             String currentExt = name.substring(lastDot + 1).toLowerCase();
             if (currentExt.equals(ext)){
                 return file;
@@ -86,9 +86,12 @@ public class FractalSaver {
 
             //подписи
             Graphics2D g2d = img.createGraphics();
-            g2d.setFont(new Font("Monospaced", Font.PLAIN, 10));
-            g2d.setColor(Color.WHITE);
+            g2d.setFont(new Font("Arial", Font.PLAIN, 12));
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             String coords = String.format("X:[%.4f;%.4f] Y:[%.4f;%.4f]", conv.xScr2Crt(0), conv.xScr2Crt(w), conv.yScr2Crt(h), conv.yScr2Crt(0));
+            g2d.setColor(Color.BLACK);
+            g2d.drawString(coords, 6, h - 4);
+            g2d.setColor(Color.WHITE)
             g2d.drawString(coords, 5, h - 5);
             g2d.dispose();
 
