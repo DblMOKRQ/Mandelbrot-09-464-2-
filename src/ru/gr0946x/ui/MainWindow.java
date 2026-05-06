@@ -6,6 +6,7 @@ import ru.gr0946x.ui.fractals.Fractal;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
+import ru.gr0946x.ui.fractals.ColorFunction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,14 +77,29 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         );
     }
 
+    private ColorFunction getColorFunction() {
+        return (value) -> {
+            if (value == 1.0) return Color.BLACK;
+            var r = (float) Math.abs(Math.sin(5 * value));
+            var g = (float) Math.abs(Math.cos(8 * value) * Math.sin(3 * value));
+            var b = (float) Math.abs((Math.sin(7 * value) + Math.cos(15 * value)) / 2f);
+            return new Color(r, g, b);
+        };
+    }
     @Override
-    public void onSaveFrac() { /* TODO п. 5а */ }
+    public void onSaveFrac() {
+        FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
+    }
 
     @Override
-    public void onSaveJpg() { /* TODO п. 5б */ }
+    public void onSaveJpg() {
+        FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
+    }
 
     @Override
-    public void onSavePng() { /* TODO п. 5в */ }
+    public void onSavePng() {
+        FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
+    }
 
     @Override
     public void onOpen() { /* TODO п. 6 */ }
