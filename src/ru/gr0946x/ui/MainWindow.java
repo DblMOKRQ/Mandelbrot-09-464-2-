@@ -1,17 +1,14 @@
 package ru.gr0946x.ui;
 
 import ru.gr0946x.Converter;
-import ru.gr0946x.ui.fractals.Fractal;
+import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
 import ru.gr0946x.ui.fractals.ColorFunction;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.io.FileInputStream;
 import java.util.LinkedList;
-import java.util.Properties;
 
 import static java.lang.Math.*;
 
@@ -47,18 +44,11 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
             Rectangle corrected = adjustRectToAspect(r,
                     mainPanel.getWidth(), mainPanel.getHeight());
 
+            saveCurrentState();
             var xMin = conv.xScr2Crt(corrected.x);
             var xMax = conv.xScr2Crt(corrected.x + corrected.width);
             var yMin = conv.yScr2Crt(corrected.y + corrected.height);
             var yMax = conv.yScr2Crt(corrected.y);
-
-
-        mainPanel.addSelectListener((r)->{
-            saveCurrentState();
-            var xMin = conv.xScr2Crt(r.x);
-            var xMax = conv.xScr2Crt(r.x + r.width);
-            var yMin = conv.yScr2Crt(r.y + r.height);
-            var yMax = conv.yScr2Crt(r.y);
             conv.setXShape(xMin, xMax);
             conv.setYShape(yMin, yMax);
             mainPanel.repaint();
@@ -235,5 +225,4 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
         return new Rectangle(x, y, newW, newH);
     }
-}
 }
