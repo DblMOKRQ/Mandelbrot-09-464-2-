@@ -20,7 +20,7 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     private final SelectablePanel mainPanel;
     private final Painter painter;
-    private final Fractal mandelbrot;
+    private final Mandelbrot mandelbrot;
     private final Converter conv;
 
     private final FractalHistory history = new FractalHistory();
@@ -130,28 +130,17 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     @Override
     public void onOpen() {
-        var chooser = new JFileChooser();
-        chooser.setDialogTitle("Открыть фрактал");
-        chooser.setFileFilter(new FileNameExtensionFilter("Fractal Data (*.frac)", "frac"));
-        int result = chooser.showOpenDialog(this);
-        if (result != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        try (var fis = new FileInputStream(chooser.getSelectedFile())) {
-            Properties props = new Properties();
-            props.load(fis);
+        FractaleState previousState = new FractaleState(
+                conv.getXMin(),
+                conv.getXMax(),
+                conv.getYMin(),
+                conv.getYMax()
+        );
 
-            double xMin = Double.parseDouble(props.getProperty("xMin"));
-            double xMax = Double.parseDouble(props.getProperty("xMax"));
-            double yMin = Double.parseDouble(props.getProperty("yMin"));
-            double yMax = Double.parseDouble(props.getProperty("yMax"));
-
-            saveCurrentState();
-            conv.setXShape(xMin, xMax);
-            conv.setYShape(yMin, yMax);
+        boolean loaded = FractalLoader.showOpenDialog(this, conv, mandelbrot);
+        if (loaded) {
+            history.add(previousState);
             mainPanel.repaint();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Не удалось открыть .frac файл", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 
