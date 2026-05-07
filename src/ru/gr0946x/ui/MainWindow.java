@@ -182,13 +182,17 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     @Override
     public void onIncreaseIterations() {
-        ((FractalPainter) painter).adjustIterationsOffset(50);
+        ((Mandelbrot) mandelbrot).setMaxIterations(
+                ((Mandelbrot) mandelbrot).getMaxIterations() + 50
+        );
         mainPanel.repaint();
     }
 
     @Override
     public void onDecreaseIterations() {
-        ((FractalPainter) painter).adjustIterationsOffset(-50);
+        ((Mandelbrot) mandelbrot).setMaxIterations(
+                ((Mandelbrot) mandelbrot).getMaxIterations() - 50
+        );
         mainPanel.repaint();
     }
 
