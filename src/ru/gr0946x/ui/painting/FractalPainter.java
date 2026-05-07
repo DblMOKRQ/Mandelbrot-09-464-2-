@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+
 public class FractalPainter implements Painter {
 
-    private final Fractal fractal;
+    private Fractal fractal;
     private final Converter conv;
-    private final ColorFunction colorFunction;
+    private ColorFunction colorFunction;
 
     private final ExecutorService executor;
     private final int cores;
@@ -59,6 +60,14 @@ public class FractalPainter implements Painter {
             dynamicIter = Math.min(dynamicIter, 2000);
             mandelbrot.setMaxIterations(dynamicIter);
         }
+    }
+
+    public void setFractal(Fractal fractal) {
+        this.fractal = fractal;
+    }
+
+    public void setColorFunction(ColorFunction colorFunction) {
+        this.colorFunction = colorFunction;
     }
 
     @Override
