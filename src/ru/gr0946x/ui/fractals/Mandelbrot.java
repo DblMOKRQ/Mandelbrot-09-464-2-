@@ -16,9 +16,6 @@ public class Mandelbrot implements Fractal{
         this.maxIterations = max(50, n);
     }
 
-    public int getMaxIterations() {
-        return maxIterations;
-    }
 
     @Override
     public float inSetProbability(double x, double y) {
