@@ -57,7 +57,12 @@ public class FractalLoader {
 
         String maxIterations = props.getProperty("maxIterations");
         if (maxIterations != null) {
-            int iterations = Integer.parseInt(maxIterations);
+            int iterations;
+            try {
+                iterations = Integer.parseInt(maxIterations);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Некорректное значение поля maxIterations: " + maxIterations);
+            }
             if (iterations > 0) {
                 mandelbrot.setMaxIterations(iterations);
             }

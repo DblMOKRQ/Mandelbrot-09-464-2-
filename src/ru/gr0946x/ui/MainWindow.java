@@ -1,7 +1,6 @@
 package ru.gr0946x.ui;
 
 import ru.gr0946x.Converter;
-import ru.gr0946x.ui.fractals.Fractal;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
@@ -16,7 +15,7 @@ public class MainWindow extends JFrame {
 
     private final SelectablePanel mainPanel;
     private final Painter painter;
-    private final Fractal mandelbrot;
+    private final Mandelbrot mandelbrot;
     private final Converter conv;
 
     
@@ -111,7 +110,7 @@ public class MainWindow extends JFrame {
 
     @Override
     public void onOpen() {
-        boolean loaded = FractalLoader.showOpenDialog(this, conv, (Mandelbrot) mandelbrot);
+        boolean loaded = FractalLoader.showOpenDialog(this, conv, mandelbrot);
         if (loaded) {
             saveCurrentState();
             mainPanel.repaint();
@@ -132,16 +131,16 @@ public class MainWindow extends JFrame {
 
     @Override
     public void onIncreaseIterations() {
-        ((Mandelbrot) mandelbrot).setMaxIterations(
-                ((Mandelbrot) mandelbrot).getMaxIterations() + 50
+        mandelbrot.setMaxIterations(
+                mandelbrot.getMaxIterations() + 50
         );
         mainPanel.repaint();
     }
 
     @Override
     public void onDecreaseIterations() {
-        ((Mandelbrot) mandelbrot).setMaxIterations(
-                ((Mandelbrot) mandelbrot).getMaxIterations() - 50
+        mandelbrot.setMaxIterations(
+                mandelbrot.getMaxIterations() - 50
         );
         mainPanel.repaint();
     }
