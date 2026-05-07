@@ -110,7 +110,13 @@ public class MainWindow extends JFrame {
     }
 
     @Override
-    public void onOpen() { /* TODO п. 6 */ }
+    public void onOpen() {
+        boolean loaded = FractalLoader.showOpenDialog(this, conv, (Mandelbrot) mandelbrot);
+        if (loaded) {
+            saveCurrentState();
+            mainPanel.repaint();
+        }
+    }
 
     @Override
     public void onUndo() { /* TODO п. 7 */ }
