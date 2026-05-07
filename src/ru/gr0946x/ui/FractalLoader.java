@@ -63,9 +63,10 @@ public class FractalLoader {
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Некорректное значение поля maxIterations: " + maxIterations);
             }
-            if (iterations > 0) {
-                mandelbrot.setMaxIterations(iterations);
+            if (iterations <= 0) {
+                throw new IllegalArgumentException("Поле maxIterations должно быть > 0");
             }
+            mandelbrot.setMaxIterations(iterations);
         }
     }
 

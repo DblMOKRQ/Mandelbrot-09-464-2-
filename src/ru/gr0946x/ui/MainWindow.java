@@ -110,9 +110,15 @@ public class MainWindow extends JFrame {
 
     @Override
     public void onOpen() {
+        FractaleState previousState = new FractaleState(
+                conv.getXMin(),
+                conv.getXMax(),
+                conv.getYMin(),
+                conv.getYMax()
+        );
         boolean loaded = FractalLoader.showOpenDialog(this, conv, mandelbrot);
         if (loaded) {
-            saveCurrentState();
+            history.add(previousState);
             mainPanel.repaint();
         }
     }
