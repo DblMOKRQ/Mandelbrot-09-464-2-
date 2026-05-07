@@ -19,8 +19,6 @@ public class FractalPainter implements Painter {
 
     private final ExecutorService executor;
     private final int cores;
-    private int manualOffset = 0;
-
 
     public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
         this.fractal = f;
@@ -51,9 +49,6 @@ public class FractalPainter implements Painter {
     public void setHeight(int height) {
         conv.setHeight(height);
     }
-    public void adjustIterationsOffset(int delta) {
-        manualOffset += delta;
-    }
 
     private void updateIterations() {
         if (fractal instanceof Mandelbrot mandelbrot) {
@@ -61,7 +56,7 @@ public class FractalPainter implements Painter {
             final double INITIAL_RANGE = 3.0;
             double zoomFactor = INITIAL_RANGE / currentRange;
             int dynamicIter = (int)(100.0 * (1.0 + Math.log10(Math.max(1.0, zoomFactor))));
-            dynamicIter = Math.min(Math.max(dynamicIter + manualOffset, 50), 2000);
+            dynamicIter = Math.min(dynamicIter, 2000);
             mandelbrot.setMaxIterations(dynamicIter);
         }
     }
