@@ -1,6 +1,5 @@
 package ru.gr0946x.ui;
 
-import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.Converter;
 import ru.gr0946x.ui.fractals.Fractal;
 import ru.gr0946x.ui.fractals.Mandelbrot;
@@ -13,7 +12,7 @@ import java.awt.*;
 
 import static java.lang.Math.*;
 
-public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
+public class MainWindow extends JFrame {
 
     private final SelectablePanel mainPanel;
     private final Painter painter;
@@ -26,29 +25,24 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
     public MainWindow(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 650));
-
         mandelbrot = new Mandelbrot();
         conv = new Converter(-2.0, 1.0, -1.0, 1.0);
-        painter = new FractalPainter(mandelbrot, conv, (value) -> {
+
+        saveCurrentState();
+
+        painter = new FractalPainter(mandelbrot, conv, (value)->{
             if (value == 1.0) return Color.BLACK;
-            var r = (float) abs(sin(5 * value));
-            var g = (float) abs(cos(8 * value) * sin(3 * value));
-            var b = (float) abs((sin(7 * value) + cos(15 * value)) / 2f);
+            var r = (float)abs(sin(5 * value));
+            var g = (float)abs(cos(8 * value) * sin (3 * value));
+            var b = (float)abs((sin(7 * value) + cos(15 * value)) / 2f);
             return new Color(r, g, b);
         });
-
         mainPanel = new SelectablePanel(painter);
-        mainPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                double cx = conv.xScr2Crt(e.getX());
-                double cy = conv.yScr2Crt(e.getY());
-
-                new JuliaWindow(cx, cy).setVisible(true);
-            }
-        });
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.addSelectListener((r) -> {
+
+
+        mainPanel.addSelectListener((r)->{
+            saveCurrentState();
             var xMin = conv.xScr2Crt(r.x);
             var xMax = conv.xScr2Crt(r.x + r.width);
             var yMin = conv.yScr2Crt(r.y + r.height);
@@ -58,11 +52,25 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
             mainPanel.repaint();
         });
 
-        setJMenuBar(new MainMenu(this).createMenuBar());
+        mainPanel.addPanListener((dx, dy) -> {
+            saveCurrentState();
+            PanHelper.translatePixels(conv, dx, dy, painter.getWidth(), painter.getHeight());
+            mainPanel.repaint();
+        });
+
         setContent();
     }
 
-    private void setContent() {
+    private void saveCurrentState() {
+        history.add(new FractaleState(
+                conv.getXMin(),
+                conv.getXMax(),
+                conv.getYMin(),
+                conv.getYMax()
+        ));
+    }
+
+    private void setContent(){
         var gl = new GroupLayout(getContentPane());
         setLayout(gl);
         gl.setVerticalGroup(gl.createSequentialGroup()
