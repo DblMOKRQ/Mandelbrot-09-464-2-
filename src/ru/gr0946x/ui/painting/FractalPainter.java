@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class FractalPainter implements Painter {
+public class FractalPainter implements Painter, AspectAwareConverter {
 
     private final Fractal fractal;
     private final Converter conv;
@@ -48,6 +48,28 @@ public class FractalPainter implements Painter {
     @Override
     public void setHeight(int height) {
         conv.setHeight(height);
+    }
+
+    @Override
+    public double getXMin() { return conv.getXMin(); }
+
+    @Override
+    public double getXMax() { return conv.getXMax(); }
+
+    @Override
+    public double getYMin() { return conv.getYMin(); }
+
+    @Override
+    public double getYMax() { return conv.getYMax(); }
+
+    @Override
+    public void setXShape(double xMin, double xMax) {
+        conv.setXShape(xMin, xMax);
+    }
+
+    @Override
+    public void setYShape(double yMin, double yMax) {
+        conv.setYShape(yMin, yMax);
     }
 
     private void updateIterations() {
