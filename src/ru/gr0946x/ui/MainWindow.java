@@ -172,8 +172,13 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         if (!history.canUndo()) {
             return;
         }
-        redoStates.add(captureCurrentState());
-        applyState(history.undo());
+        var currentState = captureCurrentState();
+        var undoState = history.undo();
+        if (undoState == null) {
+            return;
+        }
+        redoStates.add(currentState);
+        applyState(undoState);
         mainPanel.repaint();
     }
 
@@ -182,8 +187,9 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         if (redoStates.isEmpty()) {
             return;
         }
-        history.add(captureCurrentState());
+        var currentState = captureCurrentState();
         applyState(redoStates.removeLast());
+        history.add(currentState);
         mainPanel.repaint();
     }
 
