@@ -19,6 +19,8 @@ public class FractalPainter implements Painter, AspectAwareConverter {
 
     private final ExecutorService executor;
     private final int cores;
+    private int manualOffset = 0;
+
 
     public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
         this.fractal = f;
@@ -49,6 +51,9 @@ public class FractalPainter implements Painter, AspectAwareConverter {
     public void setHeight(int height) {
         conv.setHeight(height);
     }
+    public void adjustIterationsOffset(int delta) {
+        manualOffset += delta;
+    }
 
     @Override
     public double getXMin() { return conv.getXMin(); }
@@ -78,7 +83,7 @@ public class FractalPainter implements Painter, AspectAwareConverter {
             final double INITIAL_RANGE = 3.0;
             double zoomFactor = INITIAL_RANGE / currentRange;
             int dynamicIter = (int)(100.0 * (1.0 + Math.log10(Math.max(1.0, zoomFactor))));
-            dynamicIter = Math.min(dynamicIter, 2000);
+            dynamicIter = Math.min(Math.max(dynamicIter + manualOffset, 50), 2000);
             mandelbrot.setMaxIterations(dynamicIter);
         }
     }
