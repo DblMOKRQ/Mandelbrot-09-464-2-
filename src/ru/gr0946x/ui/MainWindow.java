@@ -8,21 +8,26 @@ import ru.gr0946x.ui.painting.Painter;
 import ru.gr0946x.ui.fractals.ColorFunction;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.FileInputStream;
+import java.util.LinkedList;
+import java.util.Properties;
 
 import static java.lang.Math.*;
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     private final SelectablePanel mainPanel;
     private final Painter painter;
     private final Fractal mandelbrot;
     private final Converter conv;
 
-    
     private final FractalHistory history = new FractalHistory();
+    private final LinkedList<FractaleState> redoStates = new LinkedList<>();
 
     public MainWindow(){
+        setTitle("Множество Мандельброта");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 650));
         mandelbrot = new Mandelbrot();
@@ -58,21 +63,35 @@ public class MainWindow extends JFrame {
             mainPanel.repaint();
         });
 
+        setJMenuBar(new MainMenu(this).createMenuBar());
         setContent();
     }
 
     private void saveCurrentState() {
-        history.add(new FractaleState(
+        history.add(captureCurrentState());
+        redoStates.clear();
+    }
+
+    private FractaleState captureCurrentState() {
+        return new FractaleState(
                 conv.getXMin(),
                 conv.getXMax(),
                 conv.getYMin(),
                 conv.getYMax()
-        ));
+        );
+    }
+
+    private void applyState(FractaleState state) {
+        if (state == null) {
+            return;
+        }
+        conv.setXShape(state.xMin, state.xMax);
+        conv.setYShape(state.yMin, state.yMax);
     }
 
     private void setContent(){
         var gl = new GroupLayout(getContentPane());
-        setLayout(gl);
+        getContentPane().setLayout(gl);
         gl.setVerticalGroup(gl.createSequentialGroup()
                 .addGap(8)
                 .addComponent(mainPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
@@ -110,19 +129,67 @@ public class MainWindow extends JFrame {
     }
 
     @Override
-    public void onOpen() { /* TODO п. 6 */ }
+    public void onOpen() {
+        var chooser = new JFileChooser();
+        chooser.setDialogTitle("Открыть фрактал");
+        chooser.setFileFilter(new FileNameExtensionFilter("Fractal Data (*.frac)", "frac"));
+        int result = chooser.showOpenDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        try (var fis = new FileInputStream(chooser.getSelectedFile())) {
+            Properties props = new Properties();
+            props.load(fis);
+
+            double xMin = Double.parseDouble(props.getProperty("xMin"));
+            double xMax = Double.parseDouble(props.getProperty("xMax"));
+            double yMin = Double.parseDouble(props.getProperty("yMin"));
+            double yMax = Double.parseDouble(props.getProperty("yMax"));
+
+            saveCurrentState();
+            conv.setXShape(xMin, xMax);
+            conv.setYShape(yMin, yMax);
+            mainPanel.repaint();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Не удалось открыть .frac файл", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     @Override
-    public void onUndo() { /* TODO п. 7 */ }
+    public void onUndo() {
+        if (!history.canUndo()) {
+            return;
+        }
+        redoStates.add(captureCurrentState());
+        applyState(history.undo());
+        mainPanel.repaint();
+    }
 
     @Override
-    public void onRedo() { /* TODO п. 7 */ }
+    public void onRedo() {
+        if (redoStates.isEmpty()) {
+            return;
+        }
+        history.add(captureCurrentState());
+        applyState(redoStates.removeLast());
+        mainPanel.repaint();
+    }
 
     @Override
-    public void onReset() { /* TODO */ }
+    public void onReset() {
+        saveCurrentState();
+        conv.setXShape(-2.0, 1.0);
+        conv.setYShape(-1.0, 1.0);
+        mainPanel.repaint();
+    }
 
     @Override
-    public void onShowJulia() { /* TODO п. 8 */ }
+    public void onShowJulia() {
+        double cx = (conv.getXMin() + conv.getXMax()) / 2.0;
+        double cy = (conv.getYMin() + conv.getYMax()) / 2.0;
+        var juliaWindow = new JuliaWindow(cx, cy);
+        juliaWindow.setVisible(true);
+    }
 
     @Override
     public void onIncreaseIterations() {
