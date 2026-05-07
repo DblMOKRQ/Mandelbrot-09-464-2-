@@ -17,6 +17,10 @@ import java.util.Properties;
 import static java.lang.Math.*;
 
 public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
+    private static final String PROP_X_MIN = "xMin";
+    private static final String PROP_X_MAX = "xMax";
+    private static final String PROP_Y_MIN = "yMin";
+    private static final String PROP_Y_MAX = "yMax";
 
     private final SelectablePanel mainPanel;
     private final Painter painter;
@@ -141,17 +145,25 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
             Properties props = new Properties();
             props.load(fis);
 
-            double xMin = Double.parseDouble(props.getProperty("xMin"));
-            double xMax = Double.parseDouble(props.getProperty("xMax"));
-            double yMin = Double.parseDouble(props.getProperty("yMin"));
-            double yMax = Double.parseDouble(props.getProperty("yMax"));
+            String xMinRaw = props.getProperty(PROP_X_MIN);
+            String xMaxRaw = props.getProperty(PROP_X_MAX);
+            String yMinRaw = props.getProperty(PROP_Y_MIN);
+            String yMaxRaw = props.getProperty(PROP_Y_MAX);
+            if (xMinRaw == null || xMaxRaw == null || yMinRaw == null || yMaxRaw == null) {
+                throw new IllegalArgumentException("Файл .frac не содержит все обязательные поля координат");
+            }
+
+            double xMin = Double.parseDouble(xMinRaw);
+            double xMax = Double.parseDouble(xMaxRaw);
+            double yMin = Double.parseDouble(yMinRaw);
+            double yMax = Double.parseDouble(yMaxRaw);
 
             saveCurrentState();
             conv.setXShape(xMin, xMax);
             conv.setYShape(yMin, yMax);
             mainPanel.repaint();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Не удалось открыть .frac файл", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Не удалось открыть .frac файл: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 
