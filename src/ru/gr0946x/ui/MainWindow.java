@@ -220,9 +220,13 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         int x = cx - newW / 2;
         int y = cy - newH / 2;
 
-        x = Math.clamp(x, 0, panelW - newW);
-        y = Math.clamp(y, 0, panelH - newH);
+        x = clamp(x, 0, panelW - newW);
+        y = clamp(y, 0, panelH - newH);
 
         return new Rectangle(x, y, newW, newH);
+    }
+
+    private static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(value, max));
     }
 }
