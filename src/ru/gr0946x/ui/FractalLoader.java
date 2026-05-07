@@ -57,15 +57,7 @@ public class FractalLoader {
 
         String maxIterations = props.getProperty("maxIterations");
         if (maxIterations != null) {
-            int iterations;
-            try {
-                iterations = Integer.parseInt(maxIterations);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Некорректное значение поля maxIterations: " + maxIterations);
-            }
-            if (iterations <= 0) {
-                throw new IllegalArgumentException("Поле maxIterations должно быть > 0");
-            }
+            int iterations = parsePositiveInt(maxIterations, "maxIterations");
             mandelbrot.setMaxIterations(iterations);
         }
     }
@@ -80,5 +72,18 @@ public class FractalLoader {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Некорректное значение поля " + key + ": " + value);
         }
+    }
+
+    private static int parsePositiveInt(String value, String key) {
+        int parsedValue;
+        try {
+            parsedValue = Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Некорректное значение поля " + key + ": " + value);
+        }
+        if (parsedValue <= 0) {
+            throw new IllegalArgumentException("Поле " + key + " должно быть > 0");
+        }
+        return parsedValue;
     }
 }
