@@ -5,6 +5,7 @@ import ru.gr0946x.ui.fractals.Fractal;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
+import ru.gr0946x.ui.fractals.ColorFunction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,5 +83,68 @@ public class MainWindow extends JFrame {
                 .addComponent(mainPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addGap(8)
         );
+    }
+
+    private ColorFunction getColorFunction() {
+        return (value) -> {
+            if (value == 1.0) return Color.BLACK;
+            var r = (float) Math.abs(Math.sin(5 * value));
+            var g = (float) Math.abs(Math.cos(8 * value) * Math.sin(3 * value));
+            var b = (float) Math.abs((Math.sin(7 * value) + Math.cos(15 * value)) / 2f);
+            return new Color(r, g, b);
+        };
+    }
+    @Override
+    public void onSaveFrac() {
+        FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
+    }
+
+    @Override
+    public void onSaveJpg() {
+        FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
+    }
+
+    @Override
+    public void onSavePng() {
+        FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
+    }
+
+    @Override
+    public void onOpen() { /* TODO п. 6 */ }
+
+    @Override
+    public void onUndo() { /* TODO п. 7 */ }
+
+    @Override
+    public void onRedo() { /* TODO п. 7 */ }
+
+    @Override
+    public void onReset() { /* TODO */ }
+
+    @Override
+    public void onShowJulia() { /* TODO п. 8 */ }
+
+    @Override
+    public void onIncreaseIterations() {
+        ((Mandelbrot) mandelbrot).setMaxIterations(
+                ((Mandelbrot) mandelbrot).getMaxIterations() + 50
+        );
+        mainPanel.repaint();
+    }
+
+    @Override
+    public void onDecreaseIterations() {
+        ((Mandelbrot) mandelbrot).setMaxIterations(
+                ((Mandelbrot) mandelbrot).getMaxIterations() - 50
+        );
+        mainPanel.repaint();
+    }
+
+    @Override
+    public void onOpenTour() { /* TODO п. 11* */ }
+
+    @Override
+    public void onAbout() {
+        JOptionPane.showMessageDialog(this, "Фрактал «Множество Мандельброта»\nГруппа 09-464", "О программе", JOptionPane.INFORMATION_MESSAGE);
     }
 }
