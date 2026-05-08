@@ -1,30 +1,25 @@
 package ru.gr0946x.ui;
 
 import ru.gr0946x.Converter;
-import ru.gr0946x.ui.fractals.Fractal;
-import ru.gr0946x.ui.fractals.Mandelbrot;
+import ru.gr0946x.ui.fractals.*;
 import ru.gr0946x.ui.painting.FractalPainter;
-import ru.gr0946x.ui.painting.Painter;
-import ru.gr0946x.ui.fractals.ColorFunction;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.io.FileInputStream;
 import java.util.LinkedList;
-import java.util.Properties;
-
-import static java.lang.Math.*;
 
 public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     private final SelectablePanel mainPanel;
-    private final Painter painter;
+    private final FractalPainter painter; // Изменили тип на FractalPainter
     private final Mandelbrot mandelbrot;
     private final Converter conv;
 
     private final FractalHistory history = new FractalHistory();
     private final LinkedList<FractaleState> redoStates = new LinkedList<>();
+
+    // Переменная для текущей цветовой схемы
+    private ColorFunction currentColorFunction;
 
     public MainWindow(){
         setTitle("Множество Мандельброта");
@@ -35,16 +30,13 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
         saveCurrentState();
 
-        painter = new FractalPainter(mandelbrot, conv, (value)->{
-            if (value == 1.0) return Color.BLACK;
-            var r = (float)abs(sin(5 * value));
-            var g = (float)abs(cos(8 * value) * sin (3 * value));
-            var b = (float)abs((sin(7 * value) + cos(15 * value)) / 2f);
-            return new Color(r, g, b);
-        });
-        mainPanel = new SelectablePanel(painter);
-        mainPanel.setBackground(Color.WHITE);
+        // Устанавливаем цвет по умолчанию
+        currentColorFunction = new DefaultColorScheme();
 
+        // Передаем созданную схему в отрисовщик
+// ПУНКТ 9: Передаем функцию вычисления Мандельброта через лямбда-выражение
+        painter = new FractalPainter((x, y) -> mandelbrot.inSetProbability(x, y), conv, currentColorFunction);        mainPanel = new SelectablePanel(painter);
+        mainPanel.setBackground(Color.WHITE);
 
         mainPanel.addSelectListener((r)->{
             saveCurrentState();
@@ -107,14 +99,9 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
     }
 
     private ColorFunction getColorFunction() {
-        return (value) -> {
-            if (value == 1.0) return Color.BLACK;
-            var r = (float) Math.abs(Math.sin(5 * value));
-            var g = (float) Math.abs(Math.cos(8 * value) * Math.sin(3 * value));
-            var b = (float) Math.abs((Math.sin(7 * value) + Math.cos(15 * value)) / 2f);
-            return new Color(r, g, b);
-        };
+        return currentColorFunction;
     }
+
     @Override
     public void onSaveFrac() {
         FractalSaver.showSaveDialog(this, conv, mandelbrot, getColorFunction());
@@ -184,17 +171,34 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     @Override
     public void onIncreaseIterations() {
-        ((Mandelbrot) mandelbrot).setMaxIterations(
-                ((Mandelbrot) mandelbrot).getMaxIterations() + 50
-        );
+        mandelbrot.setMaxIterations(mandelbrot.getMaxIterations() + 50);
         mainPanel.repaint();
     }
 
     @Override
     public void onDecreaseIterations() {
-        ((Mandelbrot) mandelbrot).setMaxIterations(
-                ((Mandelbrot) mandelbrot).getMaxIterations() - 50
-        );
+        mandelbrot.setMaxIterations(mandelbrot.getMaxIterations() - 50);
+        mainPanel.repaint();
+    }
+
+    @Override
+    public void onSetColorDefault() {
+        currentColorFunction = new DefaultColorScheme();
+        painter.setColorFunction(currentColorFunction);
+        mainPanel.repaint();
+    }
+
+    @Override
+    public void onSetColorFire() {
+        currentColorFunction = new FireColorScheme();
+        painter.setColorFunction(currentColorFunction);
+        mainPanel.repaint();
+    }
+
+    @Override
+    public void onSetColorZebra() {
+        currentColorFunction = new ZebraColorScheme();
+        painter.setColorFunction(currentColorFunction);
         mainPanel.repaint();
     }
 

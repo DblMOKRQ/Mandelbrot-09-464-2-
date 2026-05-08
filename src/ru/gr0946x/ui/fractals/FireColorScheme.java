@@ -5,14 +5,13 @@ import java.awt.Color;
 public class FireColorScheme implements ColorFunction {
     @Override
     public Color getColor(float value) {
-        // Если value равно 1.0, значит мы внутри множества Мандельброта
         if (value >= 1.0f) return Color.BLACK;
 
-        // Математика для красивого огненного градиента
-        int r = (int) (9.0 * (1 - value) * value * value * value * 255);
-        int g = (int) (15.0 * (1 - value) * (1 - value) * value * value * 255);
-        int b = (int) (8.5 * (1 - value) * (1 - value) * (1 - value) * value * 255);
+        // Настоящий огненный градиент
+        int r = (int) Math.min(255, value * 3 * 255);
+        int g = (int) Math.min(255, Math.max(0, (value - 0.33f) * 3 * 255));
+        int b = (int) Math.min(255, Math.max(0, (value - 0.66f) * 3 * 255));
 
-        return new Color(Math.min(255, r), Math.min(255, g), Math.min(255, b));
+        return new Color(r, g, b);
     }
 }

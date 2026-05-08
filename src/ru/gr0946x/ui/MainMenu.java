@@ -19,6 +19,11 @@ public class MainMenu {
         void onDecreaseIterations();
         void onOpenTour();
         void onAbout();
+
+        // Вот эти методы потерялись! Мы их добавляем:
+        void onSetColorDefault();
+        void onSetColorFire();
+        void onSetColorZebra();
     }
 
     private final MenuActionHandler handler;
@@ -32,6 +37,7 @@ public class MainMenu {
         menuBar.add(createFileMenu());
         menuBar.add(createEditMenu());
         menuBar.add(createViewMenu());
+        menuBar.add(createColorMenu()); // Добавили меню цветов
         menuBar.add(createAnimationMenu());
         menuBar.add(createHelpMenu());
         return menuBar;
@@ -121,6 +127,27 @@ public class MainMenu {
         menu.add(julia);
         menu.addSeparator();
         menu.add(iterMenu);
+
+        return menu;
+    }
+
+    // Новое меню для выбора цветов
+    private JMenu createColorMenu() {
+        JMenu menu = new JMenu("Цвет");
+        menu.setMnemonic(KeyEvent.VK_C);
+
+        JMenuItem colorDefault = new JMenuItem("Стандартная (RGB)");
+        colorDefault.addActionListener(e -> handler.onSetColorDefault());
+
+        JMenuItem colorFire = new JMenuItem("Огонь");
+        colorFire.addActionListener(e -> handler.onSetColorFire());
+
+        JMenuItem colorZebra = new JMenuItem("Зебра");
+        colorZebra.addActionListener(e -> handler.onSetColorZebra());
+
+        menu.add(colorDefault);
+        menu.add(colorFire);
+        menu.add(colorZebra);
 
         return menu;
     }
