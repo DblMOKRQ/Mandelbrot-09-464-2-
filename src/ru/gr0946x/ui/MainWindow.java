@@ -40,10 +40,12 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
         mainPanel.addSelectListener((r)->{
             saveCurrentState();
-            var xMin = conv.xScr2Crt(r.x);
-            var xMax = conv.xScr2Crt(r.x + r.width);
-            var yMin = conv.yScr2Crt(r.y + r.height);
-            var yMax = conv.yScr2Crt(r.y);
+            Rectangle corrected = adjustRectToAspect(r,
+                    mainPanel.getWidth(), mainPanel.getHeight());
+            var xMin = conv.xScr2Crt(corrected.x);
+            var xMax = conv.xScr2Crt(corrected.x + corrected.width);
+            var yMin = conv.yScr2Crt(corrected.y + corrected.height);
+            var yMax = conv.yScr2Crt(corrected.y);
             conv.setXShape(xMin, xMax);
             conv.setYShape(yMin, yMax);
             mainPanel.repaint();
@@ -64,7 +66,7 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         redoStates.clear();
     }
 
-    private FractaleState captureCurrentState() {
+    public FractaleState captureCurrentState() {
         return new FractaleState(
                 conv.getXMin(),
                 conv.getXMax(),
@@ -201,10 +203,41 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
     }
 
     @Override
-    public void onOpenTour() { /* TODO п. 11* */ }
+    public void onOpenTour() {
+
+      }
 
     @Override
     public void onAbout() {
         JOptionPane.showMessageDialog(this, "Фрактал «Множество Мандельброта»\nГруппа 09-464", "О программе", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private static Rectangle adjustRectToAspect(Rectangle sel,
+                                                int panelW, int panelH) {
+        if (sel.width <= 0 || sel.height <= 0 || panelW <= 0 || panelH <= 0)
+            return sel;
+
+        double targetRatio = (double) panelW / panelH;
+        double selRatio    = (double) sel.width / sel.height;
+
+        int newW, newH;
+        if (selRatio < targetRatio) {
+            newH = sel.height;
+            newW = (int) Math.round(newH * targetRatio);
+        } else {
+            newW = sel.width;
+            newH = (int) Math.round(newW / targetRatio);
+        }
+
+        int cx = sel.x + sel.width  / 2;
+        int cy = sel.y + sel.height / 2;
+
+        int x = cx - newW / 2;
+        int y = cy - newH / 2;
+
+        x = Math.clamp(x, 0, panelW - newW);
+        y = Math.clamp(y, 0, panelH - newH);
+
+        return new Rectangle(x, y, newW, newH);
     }
 }
