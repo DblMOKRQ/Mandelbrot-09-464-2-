@@ -20,6 +20,8 @@ public class FractalPainter implements Painter, AspectAwareConverter {
 
     private final ExecutorService executor;
     private final int cores;
+    private int manualOffset = 0;
+    private Mandelbrot mandelbrotRef = null;
 
     public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
         this.fractal = f;
@@ -74,14 +76,13 @@ public class FractalPainter implements Painter, AspectAwareConverter {
     }
 
     private void updateIterations() {
-        if (fractal instanceof Mandelbrot mandelbrot) {
-            double currentRange = conv.getXMax() - conv.getXMin();
-            final double INITIAL_RANGE = 3.0;
-            double zoomFactor = INITIAL_RANGE / currentRange;
-            int dynamicIter = (int)(100.0 * (1.0 + Math.log10(Math.max(1.0, zoomFactor))));
-            dynamicIter = Math.min(dynamicIter, 2000);
-            mandelbrot.setMaxIterations(dynamicIter);
-        }
+        if (mandelbrotRef == null) return;
+        double currentRange = conv.getXMax() - conv.getXMin();
+        final double INITIAL_RANGE = 3.0;
+        double zoomFactor = INITIAL_RANGE / currentRange;
+        int dynamicIter = (int)(100.0 * (1.0 + Math.log10(Math.max(1.0, zoomFactor))));
+        dynamicIter = Math.min(Math.max(dynamicIter + manualOffset, 50), 2000);
+        mandelbrotRef.setMaxIterations(dynamicIter);
     }
 
     public void setFractal(Fractal fractal) {
@@ -90,6 +91,13 @@ public class FractalPainter implements Painter, AspectAwareConverter {
 
     public void setColorFunction(ColorFunction colorFunction) {
         this.colorFunction = colorFunction;
+    }
+    public void setMandelbrotRef(Mandelbrot m) {
+        this.mandelbrotRef = m;
+    }
+
+    public void adjustIterationsOffset(int delta) {
+        manualOffset += delta;
     }
 
     @Override

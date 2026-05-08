@@ -35,7 +35,8 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
         // Передаем созданную схему в отрисовщик
 // ПУНКТ 9: Передаем функцию вычисления Мандельброта через лямбда-выражение
-        painter = new FractalPainter((x, y) -> mandelbrot.inSetProbability(x, y), conv, currentColorFunction);        mainPanel = new SelectablePanel(painter);
+        painter = new FractalPainter((x, y) -> mandelbrot.inSetProbability(x, y), conv, currentColorFunction); painter.setMandelbrotRef(mandelbrot);
+        mainPanel = new SelectablePanel(painter);
         mainPanel.setBackground(Color.WHITE);
 
         mainPanel.addSelectListener((r)->{
@@ -171,13 +172,13 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     @Override
     public void onIncreaseIterations() {
-        mandelbrot.setMaxIterations(mandelbrot.getMaxIterations() + 50);
+        painter.adjustIterationsOffset(50);
         mainPanel.repaint();
     }
 
     @Override
     public void onDecreaseIterations() {
-        mandelbrot.setMaxIterations(mandelbrot.getMaxIterations() - 50);
+        painter.adjustIterationsOffset(-50);
         mainPanel.repaint();
     }
 
