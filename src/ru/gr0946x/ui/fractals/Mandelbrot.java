@@ -15,6 +15,9 @@ public class Mandelbrot implements Fractal{
     public void setMaxIterations(int n) {
         this.maxIterations = max(50, n);
     }
+    public int getMaxIterations() {
+        return maxIterations;
+    }
 
 
     @Override
