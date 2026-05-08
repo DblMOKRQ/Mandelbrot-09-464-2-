@@ -64,7 +64,7 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
         redoStates.clear();
     }
 
-    private FractaleState captureCurrentState() {
+    public FractaleState captureCurrentState() {
         return new FractaleState(
                 conv.getXMin(),
                 conv.getXMax(),
@@ -201,7 +201,9 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
     }
 
     @Override
-    public void onOpenTour() { /* TODO п. 11* */ }
+    public void onOpenTour() {
+
+      }
 
     @Override
     public void onAbout() {
