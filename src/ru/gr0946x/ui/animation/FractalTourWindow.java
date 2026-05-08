@@ -1,4 +1,4 @@
-// FractalTour.java
+package ru.gr0946x.ui.animation;// FractalTour.java
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
