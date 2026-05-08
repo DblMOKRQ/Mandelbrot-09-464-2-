@@ -204,7 +204,10 @@ public class MainWindow extends JFrame implements MainMenu.MenuActionHandler {
 
     @Override
     public void onOpenTour() {
-
+        if (painter instanceof FractalPainter) {
+            TourWindow tourWindow = new TourWindow(this, (FractalPainter) painter, conv);
+            tourWindow.setVisible(true);
+        }
       }
 
     @Override
